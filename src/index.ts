@@ -3,17 +3,18 @@ import dotenv from 'dotenv';
 import AppError from './utils/appError';
 import { globalErrorHandler } from './utils/globalErrorHandler';
 import connectDB from './database/mongoConnection';
-
+import { loggerMiddleware } from './middlewares/logger';
 // Load environment variables from .env file
 dotenv.config();
 
 const app = express();
+app.use(loggerMiddleware);
 const uri = process.env.MONGODB_URI || '';
 
 // Ensure the database connection is established before starting the server
 connectDB(uri)
   .then(() => {
-    const port = process.env.PORT || 3001;
+    const port = process.env.NODE_ENV === 'production' ? process.env.PORT : 3001;
 
     app.get('/', (req, res) => {
       res.json({
